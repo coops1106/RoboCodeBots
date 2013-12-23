@@ -1,4 +1,4 @@
-package early;
+package com.hangfire.daco;
 
 import robocode.*;
 import robocode.util.Utils;
@@ -41,7 +41,7 @@ public class T70 extends AdvancedRobot {
         double gunTurn = angleToTarget - getGunHeadingRadians();
         setTurnGunRightRadians(1.9 * Utils.normalRelativeAngle(gunTurn));
 
-        fire(bulletPower);
+        setFire(bulletPower);
 
         double robotTurn;
         if (e.getDistance() < ENGAGEMENT_DISTANCE) {
