@@ -1,18 +1,19 @@
-package early;
+package com.hangfire.daco;
 
 import robocode.*;
 import robocode.util.Utils;
 
 import java.awt.*;
 
-public class T70 extends AdvancedRobot {
+public class T34 extends AdvancedRobot {
 
     private static final Color RUSSIAN_GREEN = new Color(60, 105, 29);
-    public static final int ENGAGEMENT_DISTANCE = 200;
+    public static final int ENGAGEMENT_DISTANCE = 500;
     private double bulletPower = Rules.MIN_BULLET_POWER;
     private double velocity = Rules.MAX_VELOCITY;
     private int scannedX = Integer.MIN_VALUE;
     private int scannedY = Integer.MIN_VALUE;
+    private int currentStep = 0;
 
     @Override
     public void run() {
@@ -25,10 +26,10 @@ public class T70 extends AdvancedRobot {
 
         setAdjustRadarForGunTurn(true);
 
-        turnRadarRightRadians(Double.POSITIVE_INFINITY);
-        while (true) {
-            System.out.println("Turning");
 
+        while (true) {
+            System.out.println("Main loop");
+            turnRadarRightRadians(Double.POSITIVE_INFINITY);
             scan();
         }
     }
@@ -37,12 +38,9 @@ public class T70 extends AdvancedRobot {
         double angleToTarget = getHeadingRadians() + e.getBearingRadians();
         double radarTurn = angleToTarget - getRadarHeadingRadians();
         setTurnRadarRightRadians(1.9 * Utils.normalRelativeAngle(radarTurn));
-
         double gunTurn = angleToTarget - getGunHeadingRadians();
         setTurnGunRightRadians(1.9 * Utils.normalRelativeAngle(gunTurn));
-
-        fire(bulletPower);
-
+        setFire(bulletPower);
         double robotTurn;
         if (e.getDistance() < ENGAGEMENT_DISTANCE) {
             robotTurn = e.getBearingRadians() + (Math.PI / 2);
@@ -51,9 +49,8 @@ public class T70 extends AdvancedRobot {
         }
         setTurnRightRadians(robotTurn);
         setAhead(velocity);
-
-        scannedX = (int)(getX() + Math.sin(angleToTarget) * e.getDistance());
-        scannedY = (int)(getY() + Math.cos(angleToTarget) * e.getDistance());
+        scannedX = (int) (getX() + Math.sin(angleToTarget) * e.getDistance());
+        scannedY = (int) (getY() + Math.cos(angleToTarget) * e.getDistance());
     }
 
     @Override
@@ -76,12 +73,17 @@ public class T70 extends AdvancedRobot {
     }
 
     @Override
+    public void onHitByBullet(final HitByBulletEvent event) {
+        velocity *= -1;
+    }
+
+    @Override
     public void onPaint(final Graphics2D g) {
         // Set the paint color to a red half transparent color
         g.setColor(new Color(0xff, 0x00, 0x00, 0x80));
 
         // Draw a line from our robot to the scanned robot
-        g.drawLine(scannedX, scannedY, (int)getX(), (int)getY());
+        g.drawLine(scannedX, scannedY, (int) getX(), (int) getY());
 
         // Draw a filled square on top of the scanned robot that covers it
         g.fillRect(scannedX - 20, scannedY - 20, 40, 40);
