@@ -12,7 +12,7 @@ public class Panther_II extends AdvancedRobot {
 
     private int moveDirection = 1;
     private double lastEnemyHeading = 0.0;
-    private int successfulOffset = 0;
+    private int toggleFactor = -1;
     private int evasiveActionCounter = 1;
 
     public void run() {
@@ -29,8 +29,7 @@ public class Panther_II extends AdvancedRobot {
     }
 
     public void onScannedRobot(ScannedRobotEvent e) {
-        double firepower = Math.min(400 / e.getDistance(), 3);
-        firepower = 3.0;
+        double firepower = 3.0;
         double currentEnemyBearing = e.getBearing();
         double currentEnemyHeading = e.getHeading();
         double turnGunRightDegrees = getHeading() - getGunHeading() + currentEnemyBearing;
@@ -42,7 +41,7 @@ public class Panther_II extends AdvancedRobot {
             adjustment = 0;
         }
         lastEnemyHeading = currentEnemyHeading;
-        setTurnGunRight(TankUtils.normalizeBearing(turnGunRightDegrees + adjustment));
+        setTurnGunRight(TankUtils.normalizeBearing(turnGunRightDegrees + (adjustment * toggleFactor)));
         setTurnRight(currentEnemyBearing);
         if (getVelocity() == 0)  {
             moveDirection *= -1;
@@ -54,6 +53,7 @@ public class Panther_II extends AdvancedRobot {
         }
         if (getGunHeat() == 0 && Math.abs(getGunTurnRemaining()) < 10)  {
             Bullet bullet = setFireBullet(firepower);
+            toggleFactor *= -1;
         }
         setTurnRadarRight(getHeading() - getRadarHeading() + currentEnemyBearing);
     }
